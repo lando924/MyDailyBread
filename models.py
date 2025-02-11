@@ -8,6 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
+# User
+# Favorites
 
 
 def connect_db(app):

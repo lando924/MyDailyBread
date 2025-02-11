@@ -18,9 +18,9 @@ The app is designed for individuals of all ages and backgrounds who are interest
 ## TECH STACK USED
 The following tech stack was used for this project: 
 
--Frontend: HTML, CSS, Bootstrap, JavaScript
--Backend: Python, Flask, Bcrypt, WTForms, Jinja, SQLAlchemy, RESTful API from https://docs.api.bible/
--Database: PostgreSQL
+- Frontend: HTML, CSS, Bootstrap, JavaScript
+- Backend: Python, Flask, Bcrypt, WTForms, Jinja, SQLAlchemy, RESTful API from https://docs.api.bible/
+- Database: PostgreSQL
 
 
 ## API
@@ -29,11 +29,11 @@ This project uses the API.Bible. It contains text from the Bible and allows the 
 ## SETUP
 To get this application running, make sure you do the following in the Terminal:
 
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-createdb mydailybread
-flask run
+-python3 -m venv venv
+-source venv/bin/activate
+-pip3 install -r requirements.txt
+-createdb mydailybread
+-flask run
 
 ## TESTS
 Information on how to run tests can be found at the top of the test files.
