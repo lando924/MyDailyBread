@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Chapters of {{ book }} the Bible (KJV)</h1>
+
+
+{% if chapters %}
+
+    <ul>
+        {% for chapter in chapters %}
+            <li><strong>{{ chapter.name }}</strong> ({{ chapter.id }})</li>
+            {% endfor %}
+    </ul>
+    {% else %}
+
+    <p>No chapters found. Please try again later.</p>
+
+{% endif %}
+
+{% endblock %}

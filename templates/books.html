@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Books of the Bible (KJV)</h1>
+
+
+{% if books %}
+
+    <ul>
+        {% for book in books %}
+            <li><strong>{{ book.name }}</strong> ({{ book.id }})</li>
+            {% endfor %}
+    </ul>
+    {% else %}
+
+    <p>No books found. Please try again later.</p>
+
+{% endif %}
+
+{% endblock %}

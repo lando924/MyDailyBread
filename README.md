@@ -24,7 +24,7 @@ The following tech stack was used for this project:
 
 
 ## API
-This project uses the API.Bible. It contains text from the Bible and allows the user to fetch specific information such as keywords or a particular chapter/verse. No authentication is required. https://scripture.api.bible/
+This project uses the API.Bible. It contains text from the Bible and allows the user to fetch specific information such as keywords or a particular chapter/verse. Create username and password here https://scripture.api.bible/. 
 
 ## SETUP
 To get this application running, make sure you do the following in the Terminal:
