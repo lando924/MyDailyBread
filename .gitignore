@@ -171,4 +171,4 @@ cython_debug/
 .pypirc
 
 # API keys and login
-API/
+api.py

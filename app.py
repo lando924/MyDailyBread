@@ -1,5 +1,5 @@
 import os
-import requests
+import requests, random
 
 from flask import Flask, render_template, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
@@ -68,20 +68,30 @@ def home_route():
     """Fetch King James Version (KJV) Bible data and render it"""
 
     bible_id = "de4e12af7f28f599-02"
-    url = f"{API_BASE_URL}/{bible_id}"
+    url = f"{API_BASE_URL}/{bible_id}/verses"
     headers = {
         "api-key": key
     }
     try:
+        # get all verses
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        data = response.json()
+        verses = response.json().get("data", [])
+
+        if verses:
+            # fetch the verse text
+            verse_url = f"{API_BASE_URL}/bibles/{bible_id}/verses/{verse_id}"
+            verse_response = requests.get(verse_url, headers=headers)
+            verse_response.raise_for_status()
+            verse_data = verse_response.json()
+        else:
+            verse_data = None
+
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching data: {e}")  # Prints the response data
-        print(response.status_code, response.text)
-        data = None 
-        
-    return render_template('home.html', data=data)
+        print(f"Error fetching data: {e}")
+        verse_data = None
+
+    return render_template('home.html', data=verse_data)
 
 
 @app.route('/books', methods=['GET'])

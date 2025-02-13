@@ -4,16 +4,25 @@
 
 <h1>My Daily Bread</h1>
 
+<div class="card text-center w-75">
+    <div class="card-header">
+        Verse of the Day
+    </div>
+    <div class="card-body">
+        {% if data %}
 
-{% if data %}
+        <h2>{{ data['data']['name'] }} ({{ data['data']['abbreviation'] }})</h2>
+        <p><strong>Language:</strong> {{ data['data']['language']['name'] }}</p>
+        <p><strong>Description:</strong> {{ data['data']['language']['name'] }}</p>
+        
+        {% else %}
+    
+        <p>No data available.</p>
+    
+        {% endif %}
+    </div>
+</div>
 
-    <h2>{{ data['data']['name'] }} ({{ data['data']['abbreviation'] }})</h2>
-    <p><strong>Language:</strong> {{ data['data']['language']['name'] }}</p>
-    <p><strong>Description:</strong> {{ data['data']['language']['name'] }}</p>
-    {% else %}
 
-    <p>No data available.</p>
-
-{% endif %}
 
 {% endblock %}
