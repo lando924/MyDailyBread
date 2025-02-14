@@ -4,7 +4,7 @@ import requests, random
 from flask import Flask, render_template, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-
+from bs4 import BeautifulSoup
 
 from api import key
 # from forms import UserAddForm, LoginForm, EditUserForm
@@ -68,25 +68,62 @@ def home_route():
     """Fetch King James Version (KJV) Bible data and render it"""
 
     bible_id = "de4e12af7f28f599-02"
-    url = f"{API_BASE_URL}/{bible_id}/verses"
     headers = {
         "api-key": key
     }
+    
     try:
-        # get all verses
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        verses = response.json().get("data", [])
+        # Step 1: fetch all books
+        books_url = f"{API_BASE_URL}/{bible_id}/books"
+        books_response = requests.get(books_url, headers=headers)
+        books_response.raise_for_status()
+        books = books_response.json().get("data", [])
 
-        if verses:
-            # fetch the verse text
-            verse_url = f"{API_BASE_URL}/bibles/{bible_id}/verses/{verse_id}"
-            verse_response = requests.get(verse_url, headers=headers)
-            verse_response.raise_for_status()
-            verse_data = verse_response.json()
-        else:
-            verse_data = None
+        if not books:
+            return render_template('home.html', data=None)
 
+        # Step 2: pick a random book
+        random_book = random.choice(books)
+        book_id = random_book["id"]
+
+
+        # Step 3: get all chapters from book
+        chapters_url = f"{API_BASE_URL}/{bible_id}/books/{book_id}/chapters"
+        chapters_response = requests.get(chapters_url, headers=headers)
+        chapters_response.raise_for_status()
+        chapters = chapters_response.json().get("data", [])
+
+        if not chapters:
+            return render_template('home.html', data=None)
+        
+        # Step 4: Pick a random chapter
+        random_chapter = random.choice(chapters)
+        chapter_id = random_chapter["id"]
+
+        # Step 5: fetch the verse text   
+        verses_url = f"{API_BASE_URL}/{bible_id}/chapters/{chapter_id}/verses"
+        verses_response = requests.get(verses_url, headers=headers)
+        verses_response.raise_for_status()
+        verses = verses_response.json().get("data", [])
+       
+        if not verses:
+            return render_template('home.html', data=None)
+        
+        # Step 6: Pick a random verse
+        random_verse = random.choice(verses)
+        verse_id = random_verse["id"]
+
+        # Step 7: Fetch the full verse text
+        verse_text_url = f"{API_BASE_URL}/{bible_id}/verses/{verse_id}"
+        verse_text_response = requests.get(verse_text_url, headers=headers)
+        verse_text_response.raise_for_status()
+        verse_data = verse_text_response.json()
+
+        if "data" in verse_data and "content" in verse_data["data"]:
+            soup = BeautifulSoup(verse_data["data"]["content"], "html.parser")
+            clean_text = soup.get_text(" ", strip=True)
+            verse_data["data"]["content"] = clean_text
+    
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")
         verse_data = None

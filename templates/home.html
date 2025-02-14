@@ -11,13 +11,13 @@
     <div class="card-body">
         {% if data %}
 
-        <h2>{{ data['data']['name'] }} ({{ data['data']['abbreviation'] }})</h2>
-        <p><strong>Language:</strong> {{ data['data']['language']['name'] }}</p>
-        <p><strong>Description:</strong> {{ data['data']['language']['name'] }}</p>
+        <h2>{{ data['data']['reference'] }} </h2>
+        <p><strong>{{ data['data']['content'] }}</strong></p>
         
+
         {% else %}
     
-        <p>No data available.</p>
+        <p>No verse available.</p>
     
         {% endif %}
     </div>
