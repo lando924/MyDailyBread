@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Favorite Verses</h1>
+
+
+{% if favorites %}
+
+    <ul>
+        {% for favorite in favorites %}
+            <li><strong>{{ favorite.name }}</strong> ({{ favorite.id }})</li>
+            {% endfor %}
+    </ul>
+    {% else %}
+
+    <p>No favorites found. Please try again later.</p>
+
+{% endif %}
+
+{% endblock %}
