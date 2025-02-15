@@ -16,7 +16,6 @@ class UserAddForm(FlaskForm):
     
 
 
-
 class LoginForm(FlaskForm):
     """Login form."""
 

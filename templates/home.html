@@ -5,6 +5,30 @@
 <h1>My Daily Bread</h1>
 
 <div class="card text-center w-75">
+    <div class="card-body">
+        <h5 class="card-title">Scripture search</h5> <br>
+        <form action="/verse">
+            <label for="">Book</label>
+            <select name="book">
+                {% for id, book in book_dict.items() %}
+                <option value="{{ id }}">{{ book }}</option>
+                {% endfor %}
+            </select>
+            <label for="">Chapter</label>
+            <input class="lookup" type="text" name="chapter" placeholder="2" required>
+            <label for="">Verses</label>
+            <input class="verses" type="number" name="verse1" min="1", max="176" placeholder="Opt.">
+            <label for="">to</label>
+            <input class="verses" type="number" name="verse2" min="1", max="176" placeholder="Opt.">
+            <br> <br>
+            <button class="btn btn-primary btn-sm">Submit</button>
+        </form>       
+    </div>
+</div>
+
+<br> <br>
+
+<div class="card text-center w-75">
     <div class="card-header">
         Verse of the Day
     </div>

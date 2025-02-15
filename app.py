@@ -106,7 +106,7 @@ def login():
 
         flash("Invalid credentials.", "danger")
     
-    return render_template('users/login.html', form=form)
+    return render_template('/users/login.html', form=form)
 
 @app.route('/logout')
 def logout():
@@ -189,26 +189,48 @@ def home_route():
 
     return render_template('home.html', data=verse_data)
 
+@app.route('/verse', methods=['GET'])
+def search_verse():
+    """Handles scripture search"""
+
+    book = request.args.get("book")
+    chapter = request.args.get("chapter")
+    verse1 = request.args.get("verse1")
+    verse2 = request.args.get("verse2")
+
+    if not book or not chapter:
+        flash("Book and Chapter are required.", "warning")
+        return redirect('/')
+    
+    # 
+
+    bible_id = "de4e12af7f28f599-02"
+    url = 
+    headers = {"api_key": key}
+    response = requests.get(url, headers=headers)
+    
+
+
 ############################################################################
 # Favorite routes:
 
-@app.route('/favorites/add_favorite/<int:verse_id', methods=['POST'])
-def user_favorites(verse_id):
-    """favorite/unfavorite a verse"""
+# @app.route('/favorites/add_favorite/<int:verse_id', methods=['POST'])
+# def user_favorites(verse_id):
+#     """favorite/unfavorite a verse"""
 
-    if not g.user:
-        flash("You must be logged in to like!", "danger")
-        return redirect("/")
+#     if not g.user:
+#         flash("You must be logged in to like!", "danger")
+#         return redirect("/")
     
-    verse = 
+#     verse = 
     
     
 
-@app.route('/favorites/<int:user_id>')
-def show_favorites(user_id):
-    """shows users favorites"""
+# @app.route('/favorites/<int:user_id>')
+# def show_favorites(user_id):
+#     """shows users favorites"""
 
-    user
+#     user
 
 
 @app.route('/books', methods=['GET'])
