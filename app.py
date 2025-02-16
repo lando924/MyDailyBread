@@ -15,6 +15,8 @@ CURR_USER_KEY = "curr_user"
 API_BASE_URL = "https://api.scripture.api.bible/v1/bibles"
 
 
+
+
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///mydailybread'
@@ -124,22 +126,46 @@ def logout():
 
 @app.route('/', methods=['GET'])
 def home_route():
-    """Fetch King James Version (KJV) Bible data and render it"""
+    """Fetch Bible data and render it"""
 
-    bible_id = "de4e12af7f28f599-02"
+    bible_id = "9879dbb7cfe39e4d-01"
     headers = {
         "api-key": key
     }
     
+    def get_books():
+
+        bible_id = "9879dbb7cfe39e4d-01"
+        url = f"{API_BASE_URL}/{bible_id}/books"
+        headers = {"api-key": key}
+
+        try:
+            response = requests.get(url, headers=headers)
+            print(f"Request URL: {url}")
+            print(f"Rsponse Status Code: {response.status_code}")
+
+            response.raise_for_status()
+            books_data = response.json()
+            return books_data
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching books: {e}")
+            books_data = None
+
+    books = get_books()
+    print("Books Data:", books)
+    
+
+
     try:
         # Step 1: fetch all books
-        books_url = f"{API_BASE_URL}/{bible_id}/books"
-        books_response = requests.get(books_url, headers=headers)
-        books_response.raise_for_status()
-        books = books_response.json().get("data", [])
+        # books_url = f"{API_BASE_URL}/{bible_id}/books"
+        # books_response = requests.get(books_url, headers=headers)
+        # books_response.raise_for_status()
+        # books = books_response.json().get("data", [])
+        books
 
         if not books:
-            return render_template('home.html', data=None)
+            return render_template('home.html', data=None, books={})
 
         # Step 2: pick a random book
         random_book = random.choice(books)
@@ -203,11 +229,16 @@ def search_verse():
         return redirect('/')
     
     # 
+    verse_range = f"{verse1}-{verse2}" if verse1 and verse2 else verse1
+    reference = f"{book} {chapter}:{verse_range}" if verse_range else f"{book} {chapter}"
 
-    bible_id = "de4e12af7f28f599-02"
-    url = 
+
+    bible_id = "9879dbb7cfe39e4d-01"
+    url = f"{API_BASE_URL}/{bible_id}/chapters/{chapter}/verse"
     headers = {"api_key": key}
     response = requests.get(url, headers=headers)
+
+    return render_template('/users/search.html')
     
 
 
@@ -237,7 +268,7 @@ def search_verse():
 def get_books():
     """Fetch and display all books from the King James Version."""
 
-    bible_id = "de4e12af7f28f599-02"
+    bible_id = "9879dbb7cfe39e4d-01"
     url = f"{API_BASE_URL}/{bible_id}/books"
     headers = {"api-key": key}
 
@@ -262,7 +293,7 @@ def get_books():
 def get_chapters():
     """Fetch and display all chapters from the King James Version."""
 
-    bible_id = "de4e12af7f28f599-02"
+    bible_id = "9879dbb7cfe39e4d-01"
     book_id = "LUK"
     url = f"{API_BASE_URL}/{bible_id}/books/{book_id}/chapters"
     headers = {"api-key": key}

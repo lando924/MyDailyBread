@@ -10,7 +10,7 @@
         <form action="/verse">
             <label for="">Book</label>
             <select name="book">
-                {% for id, book in book_dict.items() %}
+                {% for id, book in books %}
                 <option value="{{ id }}">{{ book }}</option>
                 {% endfor %}
             </select>
