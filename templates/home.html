@@ -8,10 +8,10 @@
     <div class="card-body">
         <h5 class="card-title">Scripture search</h5> <br>
         <form action="/verse">
-            <label for="">Book</label>
+            <label for="book">Book</label>
             <select name="book">
-                {% for id, book in books %}
-                <option value="{{ id }}">{{ book }}</option>
+                {% for book in books %}
+                <option value="{{ book.id }}">{{ book.name }}</option>
                 {% endfor %}
             </select>
             <label for="">Chapter</label>
@@ -46,6 +46,20 @@
         {% endif %}
     </div>
 </div>
+
+
+{% if books %}
+
+    <ul>
+        {% for book in books %}
+            <li><strong>{{ book.name }}</strong> ({{ book.id }})</li>
+            {% endfor %}
+    </ul>
+    {% else %}
+
+    <p>No books found. Please try again later.</p>
+
+{% endif %}
 
 
 

@@ -133,36 +133,14 @@ def home_route():
         "api-key": key
     }
     
-    def get_books():
-
-        bible_id = "9879dbb7cfe39e4d-01"
-        url = f"{API_BASE_URL}/{bible_id}/books"
-        headers = {"api-key": key}
-
-        try:
-            response = requests.get(url, headers=headers)
-            print(f"Request URL: {url}")
-            print(f"Rsponse Status Code: {response.status_code}")
-
-            response.raise_for_status()
-            books_data = response.json()
-            return books_data
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching books: {e}")
-            books_data = None
-
-    books = get_books()
-    print("Books Data:", books)
     
-
 
     try:
         # Step 1: fetch all books
-        # books_url = f"{API_BASE_URL}/{bible_id}/books"
-        # books_response = requests.get(books_url, headers=headers)
-        # books_response.raise_for_status()
-        # books = books_response.json().get("data", [])
-        books
+        books_url = f"{API_BASE_URL}/{bible_id}/books"
+        books_response = requests.get(books_url, headers=headers)
+        books_response.raise_for_status()
+        books = books_response.json().get("data", [])    
 
         if not books:
             return render_template('home.html', data=None, books={})
@@ -212,8 +190,9 @@ def home_route():
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")
         verse_data = None
+        return render_template('home.html', data=None, books=[])
 
-    return render_template('home.html', data=verse_data)
+    return render_template('home.html', data=verse_data, books=books)
 
 @app.route('/verse', methods=['GET'])
 def search_verse():
