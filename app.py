@@ -1,6 +1,6 @@
 import requests, random
 
-from flask import Flask, render_template, flash, redirect, session, g
+from flask import Flask, render_template, flash, request, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from bs4 import BeautifulSoup
@@ -198,26 +198,152 @@ def home_route():
 def search_verse():
     """Handles scripture search"""
 
-    book = request.args.get("book")
-    chapter = request.args.get("chapter")
-    verse1 = request.args.get("verse1")
-    verse2 = request.args.get("verse2")
-
-    if not book or not chapter:
-        flash("Book and Chapter are required.", "warning")
-        return redirect('/')
-    
-    # 
-    verse_range = f"{verse1}-{verse2}" if verse1 and verse2 else verse1
-    reference = f"{book} {chapter}:{verse_range}" if verse_range else f"{book} {chapter}"
-
-
     bible_id = "9879dbb7cfe39e4d-01"
-    url = f"{API_BASE_URL}/{bible_id}/chapters/{chapter}/verse"
-    headers = {"api_key": key}
-    response = requests.get(url, headers=headers)
+    headers = {
+        "api-key": key
+    }
 
-    return render_template('/users/search.html')
+    try:
+        # search parameters
+        book_id = request.args.get("book")
+        chapter = request.args.get("chapter")
+        verse = request.args.get("verse1")
+        
+        if not all([book_id, chapter, verse]):
+            return render_template('home.html', data=None, books=[], error='Missing search parameters')
+        
+        # Step 1: Get all books for drop
+        books_url = f"{API_BASE_URL}/{bible_id}/books"
+        books_response = requests.get(books_url, headers=headers)
+        books_response.raise_for_status()
+        books = books_response.json().get("data", [])    
+
+        if not books:
+            return render_template('home.html', data=None, books={})
+
+        # Step 3: Find the specific chapter ID 
+        chapters_url = f"{API_BASE_URL}/{bible_id}/books/{book_id}/chapters"
+        chapters_response = requests.get(chapters_url, headers=headers)
+        chapters_response.raise_for_status()
+        chapters = chapters_response.json().get("data", [])
+
+        if not chapters:
+            return render_template('home.html', data=None)
+
+        # Step 5: fetch the verse text   
+        verses_url = f"{API_BASE_URL}/{bible_id}/books/chapters/{chapter}/verses"
+        verses_response = requests.get(verses_url, headers=headers)
+        verses_response.raise_for_status()
+        verses = verses_response.json().get("data", [])
+       
+        if not verses:
+            return render_template('home.html', data=None)
+
+        # Step 7: Fetch the full verse text
+        verse_text_url = f"{API_BASE_URL}/{bible_id}/verses/{verses}"
+        verse_text_response = requests.get(verse_text_url, headers=headers)
+        verse_text_response.raise_for_status()
+        verse_data = verse_text_response.json()
+
+        if "data" in verse_data and "content" in verse_data["data"]:
+            soup = BeautifulSoup(verse_data["data"]["content"], "html.parser")
+            clean_text = soup.get_text(" ", strip=True)
+            verse_data["data"]["content"] = clean_text
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
+        verse_data = None
+        return render_template('/users/search.html', data=None, books=[])
+
+    return render_template('/users/search.html', data=verse_data, books=books)
+        
+
+        # verse2 = request.args.get("verse2")
+
+        # print(f"Search params: book={book_id}, chapter={chapter}, verse1={verse1}")
+
+        # if not book_id or not chapter:
+        #     flash("Book and Chapter are required.", "warning")
+        #     return redirect('/')
+        
+        # # Step 1: Get the chapter ID
+        # chapters_url = f"{API_BASE_URL}/{bible_id}/books/{book_id}/chapters"
+        # chapters_response = requests.get(chapters_url, headers=headers)
+        # chapters_response.raise_for_status()
+        # chapters = chapters_response.json().get("data", [])
+
+        # # find the specific chapter
+        # chapter_id = None
+        # for chap in chapters:
+        #     if chap.get("number") == chapter:
+        #         chapter_id = chap.get("id")
+        
+        # print(f"Chapter ID: {chapter_id}")
+
+        # if not chapter_id:
+        #     flash("Chapter not found.", "danger")
+        #     return redirect('/')
+        
+        # # Get verses for the chapter
+        # verses_url = f"{API_BASE_URL}/{bible_id}/chapters/{chapter_id}/verses"
+        # verses_response = requests.get(verses_url, headers=headers)
+        # verses_response.raise_for_status()
+        # verses = verses_response.json().get("data", [])
+
+        # print(f"Number of verses found: {len(verses)}")
+
+        # # Get verse content
+        # verse_contents = []
+        # if verse1 and verse2: # handle verse range
+        #     start = int(verse1)
+        #     end = int(verse2)
+        #     verse_ids = [verse['id'] for verse in verses 
+        #         if start <= int(verse.get('number', 0)) <= end]
+        # elif verse1: # handle single verse
+        #     verse_ids = [verse['id'] for verse in verses if str(verse.get('number')) == str(verse1)]
+
+        # else:
+        #     verse_ids = [verse['id'] for verse in verses]
+        
+        # print(f"Filtered verse IDs: {verse_ids}")
+
+        # print(f"Verse IDs to fetch: {verse_ids}")
+
+        # # fetch content from verses
+        # for verse_id in verse_ids:
+        #     verse_url = f"{API_BASE_URL}/{bible_id}/verses/{verse_id}"
+        #     verse_response = requests.get(verse_url, headers=headers)
+        #     verse_response.raise_for_status()
+        #     verse_data = verse_response.json().get("data", {})
+
+        #     # Clean HTML from content
+        #     if verse_data.get("content"):
+        #         soup = BeautifulSoup(verse_data["content"], "html.parser")
+        #         clean_text = soup.get_text(" ", strip=True)
+
+        #         verse_contents.append({
+        #             'verse': verse_data.get('reference', '').split(':')[-1],
+        #             'text': clean_text,
+        #             'book': book_id,
+        #             'chapter': chapter,
+        #             'translation': bible_id
+        #         })
+        # print(f"Verses API response:", verses_response.json())
+        # print(f"Verse contents: {verse_contents}")
+
+        # # Get book name for display
+        # books_url = f"{API_BASE_URL}/{bible_id}/books"
+        # books_response = requests.get(books_url, headers=headers)
+        # books_response.raise_for_status()
+        # books = books_response.json().get("data", [])
+        # book_dict = {book['id']: book['name'] for book in books}
+
+    #     return render_template('users/search.html', data=verse_data)
+
+    # except requests.exceptions.RequestException as e:
+    #     print(f"Error fetching data: {e}")
+    #     flash("Error fetching verses. Please try again.", "danger")
+    #     return redirect('/')
     
 
 
